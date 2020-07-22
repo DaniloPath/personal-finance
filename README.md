@@ -1,6 +1,7 @@
-# personal-finance
+# personal-finance :dollar: :smile:
 
 ### Objetivos
+
 
 Exercitar os seguintes conceitos trabalhados nos Módulos 01 a 04:
 - Implementação de algoritmos com JavaScript.
