@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 let schema = mongoose.Schema({
-  description: { type: String, required: true },
-  value: { type: Number, required: true },
-  category: { type: String, required: true },
-  year: { type: Number, required: true },
-  month: { type: Number, required: true },
-  day: { type: Number, required: true },
-  yearMonth: { type: String, required: true },
-  yearMonthDay: { type: String, required: true },
-  type: { type: String, required: true },
+  description: { type: String },
+  value: { type: Number },
+  category: { type: String },
+  year: { type: Number },
+  month: { type: Number },
+  day: { type: Number },
+  yearMonth: { type: String },
+  yearMonthDay: { type: String },
+  type: { type: String },
 });
 
 const TransactionModel = mongoose.model('transaction', schema);

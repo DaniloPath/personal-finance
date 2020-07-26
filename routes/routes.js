@@ -8,7 +8,7 @@ transactionRouter.get(
   transactionService.findDistincPeriods
 );
 transactionRouter.post('/', transactionService.create);
-transactionRouter.put('/', transactionService.update);
-transactionRouter.delete('/', transactionService.remove);
+transactionRouter.put('/:id', transactionService.update);
+transactionRouter.delete('/:id', transactionService.remove);
 
 module.exports = transactionRouter;

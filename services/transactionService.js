@@ -53,7 +53,8 @@ function getData(filter) {
   }
   return TransactionModel.find();
 }
-
+//http://localhost:3001/api/transaction?2019-01
+//(localiza todas as trasções em janeiro de 2019)
 async function findDistincPeriods(_, res) {
   try {
     const data = await TransactionModel.distinct('yearMonth');
@@ -75,39 +76,35 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
+  const id = req.params.id;
   try {
-    const { _id } = req.query;
+    const { _id } = req.query(`/?_id=${id}`);
     console.log(_id);
-    if (!_id) {
-      throw { message: 'Informar id do elemento', errNumber: 400 };
-    }
-    const data = await TransactionModel.findOneAndUpdate({ _id }, req.body, {
-      new: true,
-    });
+    if (!_id) throw { message: 'Informar id do elemento', errNumber: 400 };
+    const data = await TransactionModel.findOneAndUpdate(
+      { _id: id },
+      req.body,
+      {
+        new: true,
+      }
+    );
     console.log(`PUT: Object (id=${_id})`);
     res.send(data);
   } catch (err) {
-    res.status(!!errNumber ? errNumber : 500).send(err.message);
+    res.status(!!err.errNumber ? err.errNumber : 500).send(err.message);
   }
 }
 
+//http://localhost:3001/api/transaction/id:5f173dc3822799348c486b54
 async function remove(req, res) {
+  const id = req.params.id;
+  console.log(id);
   try {
-    const { _id } = req.query;
-    console.log(_id);
-    if (!_id) {
-      throw { message: 'Informar id do elemento', errNumber: 400 };
-    }
-    const data = await TransactionModel.findByIdAndDelete({ _id });
-    if (!data)
-      throw {
-        message: 'Não foram encontrados elementos com esse id',
-        errNumber: 404,
-      };
+    const data = await TransactionModel.findByIdAndDelete({ _id: id });
+    res.status(200).send(data);
     console.log(`DELETE: Object (id=${_id})`);
-    res.send(data);
-  } catch (err) {
-    res.status(!!errNumber ? errNumber : 500).send(err.message);
+  } catch (error) {
+    res.status(500).send(error);
   }
 }
 
