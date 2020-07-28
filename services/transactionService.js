@@ -1,6 +1,35 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
+function clearTransaction(mongoDbDate) {
+  const {
+    _id,
+    description,
+    value,
+    category,
+    year,
+    month,
+    day,
+    yearMonth,
+    yearMonthDay,
+    Type,
+  } = mongoDbDate;
+
+  const reTransaction = {
+    _id,
+    description,
+    value,
+    category,
+    year,
+    month,
+    day,
+    yearMonth,
+    yearMonthDay,
+    Type,
+  };
+  return reTransaction;
+}
+
 // Aqui havia um erro difícil de pegar. Importei como "transactionModel",
 // com "t" minúsculo. No Windows, isso não faz diferença. Mas como no Heroku
 // o servidor é Linux, isso faz diferença. Gastei umas boas horas tentando
@@ -65,47 +94,21 @@ async function findDistincPeriods(_, res) {
   }
 }
 
-async function create(req, res) {
-  try {
-    const data = await TransactionModel.create(req.body);
-    console.log(`POST: Object (id=${data._id})`);
-    res.send(data);
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
+async function create(transaction) {
+  const newDateMongoDB = await TransactionModel.create(transaction);
+  const newDate = clearTransaction(newDateMongoDB);
+  return newDate;
 }
 
-async function update(req, res) {
-  const id = req.params.id;
-  try {
-    const { _id } = req.query(`/?_id=${id}`);
-    console.log(_id);
-    if (!_id) throw { message: 'Informar id do elemento', errNumber: 400 };
-    const data = await TransactionModel.findOneAndUpdate(
-      { _id: id },
-      req.body,
-      {
-        new: true,
-      }
-    );
-    console.log(`PUT: Object (id=${_id})`);
-    res.send(data);
-  } catch (err) {
-    res.status(!!err.errNumber ? err.errNumber : 500).send(err.message);
-  }
+async function update(_id, transaction) {
+  await TransactionModel.updateOne({ _id: ObjectId(_id), transaction });
+  return { _id, ...transaction };
 }
 
 //http://localhost:3001/api/transaction/id:5f173dc3822799348c486b54
-async function remove(req, res) {
-  const id = req.params.id;
-  console.log(id);
-  try {
-    const data = await TransactionModel.findByIdAndDelete({ _id: id });
-    res.status(200).send(data);
-    console.log(`DELETE: Object (id=${_id})`);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+async function remove(_id) {
+  await TransactionModel.deleteOne({ _id: ObjectId(_id) });
+  return true;
 }
 
 module.exports = { find, findDistincPeriods, create, update, remove };
