@@ -11,6 +11,7 @@ export default function ListScreen({
   onDeleteTransaction,
   onPeriodChange,
   currentPeriod,
+  onEditTransaction,
 }) {
   const { transactionStyle, buttonStyle } = styles;
   return (
@@ -41,7 +42,13 @@ export default function ListScreen({
             style={{ ...transactionStyle, backgroundColor: currentColor }}
           >
             <span style={buttonStyle}>
-              <button className="waves-effect waves-light btn">Editar</button>
+              <button
+                className="waves-effect waves-light btn"
+                onClick={onEditTransaction}
+                id={transaction._id}
+              >
+                Editar
+              </button>
               <button
                 className="waves-effect waves-light btn red darken-4"
                 onClick={onDeleteTransaction}

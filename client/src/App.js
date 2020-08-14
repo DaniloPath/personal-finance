@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import ListScreen from './components/ListScreen';
+import MaintenanceScreen from './components/MaintenanceScreen';
 
 const api = axios.create({ baseURL: 'api' });
 const root = '/transaction';
@@ -53,6 +54,7 @@ export default function App() {
   const [currentPeriod, setCurrentPeriod] = React.useState(PERIODS[0]);
   const [currentScreen, setCurrentScreen] = React.useState(0);
   const [filteredText, setFilteredText] = React.useState('');
+  const [selectedTransaction, setSelectedTransaction] = React.useState(null);
 
   React.useEffect(() => {
     const fetchTransactions = async () => {
@@ -77,6 +79,13 @@ export default function App() {
     setFilteredTransactions(newFilter);
   }, [transactions, filteredText]);
 
+  React.useEffect(() => {
+    const newScreen =
+      selectedTransaction !== null ? MAINTENANCE_SCREEN : LIST_SCREEN;
+
+    setCurrentScreen(newScreen);
+  }, [selectedTransaction]);
+
   const handlePeriodChange = (event) => {
     const newPeriod = event.target.value;
     setCurrentPeriod(newPeriod);
@@ -91,6 +100,18 @@ export default function App() {
     });
 
     setTransactions(newTransactions);
+  };
+
+  const handleEditTransaction = async (event) => {
+    const id = event.target.id;
+
+    const newSelectedTransaction = filteredTransactions.find((item) => {
+      return item._id === id;
+    });
+
+    console.log(newSelectedTransaction);
+
+    setSelectedTransaction(newSelectedTransaction);
   };
 
   const handleFilterChange = (event) => {
@@ -109,11 +130,12 @@ export default function App() {
           currentPeriod={currentPeriod}
           filteredText={filteredText}
           onDeleteTransaction={handleDeleteTransaction}
+          onEditTransaction={handleEditTransaction}
           onFilterChange={handleFilterChange}
           onPeriodChange={handlePeriodChange}
         />
       ) : (
-        <p>Tela de Manutenção</p>
+        <MaintenanceScreen />
       )}
     </div>
   );
