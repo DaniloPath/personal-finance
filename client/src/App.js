@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 
 const api = axios.create({ baseURL: 'api' });
+const root = '/transaction';
 
 const PERIODS = [
   '2019-01',
@@ -60,18 +61,32 @@ export default function App() {
       console.log(data);
 
       setTransactions(data.transactions);
-      setFilteredTransactions(data.transactions);
     };
 
     fetchTransactions();
   }, [currentPeriod]);
+
+  React.useEffect(() => {
+    setFilteredTransactions(transactions);
+  }, [transactions]);
 
   const handlePeriodChange = (event) => {
     const newPeriod = event.target.value;
     setCurrentPeriod(newPeriod);
   };
 
-  const { transactionStyle } = styles;
+  const handleDeleteTransaction = async (event) => {
+    const id = event.target.id;
+    await api.delete(`${root}/${id}`);
+
+    const newTransactions = transactions.filter((transaction) => {
+      return transaction._id !== id;
+    });
+
+    setTransactions(newTransactions);
+  };
+
+  const { transactionStyle, buttonStyle } = styles;
 
   return (
     <div className="container">
@@ -93,14 +108,29 @@ export default function App() {
             const currentColor =
               transaction.type === '+' ? receita_color : despesa_color;
             return (
-              <p
+              <div
                 key={transaction._id}
                 style={{ ...transactionStyle, backgroundColor: currentColor }}
               >
-                {transaction.yearMonthDay} -{' '}
-                <strong>{transaction.category}</strong> -{' '}
-                {transaction.description} - {transaction.value}
-              </p>
+                <span style={buttonStyle}>
+                  <button className="waves-effect waves-light btn">
+                    Editar
+                  </button>
+                  <button
+                    className="waves-effect waves-light btn red darken-4"
+                    onClick={handleDeleteTransaction}
+                    id={transaction._id}
+                  >
+                    X
+                  </button>
+                </span>
+
+                <span>
+                  {transaction.yearMonthDay} -{' '}
+                  <strong>{transaction.category}</strong> -{' '}
+                  {transaction.description} - {transaction.value}
+                </span>
+              </div>
             );
           })}
         </>
@@ -117,5 +147,8 @@ const styles = {
     margin: '5px',
     border: '1px solid lightgray',
     borderRadius: '5px',
+  },
+  buttonStyle: {
+    margin: '10px',
   },
 };
