@@ -54,6 +54,7 @@ export default function App() {
   const [filteredTransactions, setFilteredTransactions] = React.useState([]);
   const [currentPeriod, setCurrentPeriod] = React.useState(PERIODS[0]);
   const [currentScreen, setCurrentScreen] = React.useState(0);
+  const [filteredText, setFilteredText] = React.useState('');
 
   React.useEffect(() => {
     const fetchTransactions = async () => {
@@ -67,8 +68,16 @@ export default function App() {
   }, [currentPeriod]);
 
   React.useEffect(() => {
-    setFilteredTransactions(transactions);
-  }, [transactions]);
+    let newFilter = [...transactions];
+
+    if (filteredText.trim() !== '') {
+      newFilter = newFilter.filter((transaction) => {
+        return transaction.description.toLowerCase().includes(filteredText);
+      });
+    }
+
+    setFilteredTransactions(newFilter);
+  }, [transactions, filteredText]);
 
   const handlePeriodChange = (event) => {
     const newPeriod = event.target.value;
@@ -84,6 +93,11 @@ export default function App() {
     });
 
     setTransactions(newTransactions);
+  };
+
+  const handleFilterChange = (event) => {
+    const text = event.target.value.trim();
+    setFilteredText(text.toLowerCase());
   };
 
   const { transactionStyle, buttonStyle } = styles;
@@ -103,6 +117,13 @@ export default function App() {
               return <option key={period}>{period}</option>;
             })}
           </select>
+
+          <input
+            type="text"
+            placeholder="Filtro..."
+            value={filteredText}
+            onChange={handleFilterChange}
+          />
 
           {filteredTransactions.map((transaction) => {
             const currentColor =
