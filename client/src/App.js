@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import ListScreen from './components/ListScreen';
 
 const api = axios.create({ baseURL: 'api' });
 const root = '/transaction';
@@ -45,9 +46,6 @@ const PERIODS = [
 
 const LIST_SCREEN = 0;
 const MAINTENANCE_SCREEN = 1;
-
-const receita_color = '#81ecec';
-const despesa_color = '#fab1a0';
 
 export default function App() {
   const [transactions, setTransactions] = React.useState([]);
@@ -100,76 +98,23 @@ export default function App() {
     setFilteredText(text.toLowerCase());
   };
 
-  const { transactionStyle, buttonStyle } = styles;
-
   return (
     <div className="container">
       <h1 className="center">Desafio Final do Bootcamp Full Stack</h1>
 
       {currentScreen === LIST_SCREEN ? (
-        <>
-          <select
-            className="browser-default"
-            value={currentPeriod}
-            onChange={handlePeriodChange}
-          >
-            {PERIODS.map((period) => {
-              return <option key={period}>{period}</option>;
-            })}
-          </select>
-
-          <input
-            type="text"
-            placeholder="Filtro..."
-            value={filteredText}
-            onChange={handleFilterChange}
-          />
-
-          {filteredTransactions.map((transaction) => {
-            const currentColor =
-              transaction.type === '+' ? receita_color : despesa_color;
-            return (
-              <div
-                key={transaction._id}
-                style={{ ...transactionStyle, backgroundColor: currentColor }}
-              >
-                <span style={buttonStyle}>
-                  <button className="waves-effect waves-light btn">
-                    Editar
-                  </button>
-                  <button
-                    className="waves-effect waves-light btn red darken-4"
-                    onClick={handleDeleteTransaction}
-                    id={transaction._id}
-                  >
-                    X
-                  </button>
-                </span>
-
-                <span>
-                  {transaction.yearMonthDay} -{' '}
-                  <strong>{transaction.category}</strong> -{' '}
-                  {transaction.description} - {transaction.value}
-                </span>
-              </div>
-            );
-          })}
-        </>
+        <ListScreen
+          transactions={filteredTransactions}
+          periods={PERIODS}
+          currentPeriod={currentPeriod}
+          filteredText={filteredText}
+          onDeleteTransaction={handleDeleteTransaction}
+          onFilterChange={handleFilterChange}
+          onPeriodChange={handlePeriodChange}
+        />
       ) : (
         <p>Tela de Manutenção</p>
       )}
     </div>
   );
 }
-
-const styles = {
-  transactionStyle: {
-    padding: '5px',
-    margin: '5px',
-    border: '1px solid lightgray',
-    borderRadius: '5px',
-  },
-  buttonStyle: {
-    margin: '10px',
-  },
-};
