@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function MaintenanceScreen({ transaction }) {
+export default function MaintenanceScreen({ transaction, onCancel, onSave }) {
   const [description, setDescription] = React.useState('');
   const [value, setValue] = React.useState(0);
   const [category, setCategory] = React.useState('');
@@ -46,6 +46,22 @@ export default function MaintenanceScreen({ transaction }) {
     setType(newType);
   };
 
+  const handleClickCancel = () => {
+    onCancel();
+  };
+
+  const handleClickSave = () => {
+    const newTransaction = {
+      id: transaction._id,
+      description,
+      value,
+      type,
+      yearMonthDay: date,
+      category,
+    };
+    onSave(newTransaction);
+  };
+
   return (
     <div>
       <span>
@@ -60,7 +76,7 @@ export default function MaintenanceScreen({ transaction }) {
           <span>Despesa</span>
         </label>
       </span>
-      <span>
+      <span style={{ marginLeft: '15px' }}>
         <label>
           <input
             type="radio"
@@ -120,10 +136,16 @@ export default function MaintenanceScreen({ transaction }) {
           </label>
         </div>
 
-        <button className="waves-effect waves-light btn">Salvar</button>
+        <button
+          className="waves-effect waves-light btn"
+          onClick={handleClickSave}
+        >
+          Salvar
+        </button>
         <button
           className="waves-effect waves-light btn red darken-4"
           style={{ marginLeft: '10px' }}
+          onClick={handleClickCancel}
         >
           Cancelar
         </button>

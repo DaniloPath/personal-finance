@@ -116,6 +116,24 @@ export default function App() {
     setFilteredText(text.toLowerCase());
   };
 
+  const handleCancel = () => {
+    setSelectedTransaction(null);
+  };
+
+  const handleSave = (newTransaction) => {
+    console.log(newTransaction);
+    const { id } = newTransaction;
+
+    const completeTransaction = {
+      ...newTransaction,
+      year: Number(newTransaction.yearMonthDay.substring(0, 4)),
+      month: Number(newTransaction.yearMonthDay.substring(5, 7)),
+      day: Number(newTransaction.yearMonthDay.substring(8, 10)),
+    };
+
+    api.put(`${root}/${id}`, completeTransaction);
+  };
+
   return (
     <div className="container">
       <h1 className="center">Desafio Final do Bootcamp Full Stack</h1>
@@ -132,7 +150,11 @@ export default function App() {
           onPeriodChange={handlePeriodChange}
         />
       ) : (
-        <MaintenanceScreen transaction={selectedTransaction} />
+        <MaintenanceScreen
+          transaction={selectedTransaction}
+          onCancel={handleCancel}
+          onSave={handleSave}
+        />
       )}
     </div>
   );
