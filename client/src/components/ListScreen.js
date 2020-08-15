@@ -17,23 +17,39 @@ export default function ListScreen({
   const { transactionStyle, buttonStyle } = styles;
   return (
     <>
-      <select
-        className="browser-default"
-        value={currentPeriod}
-        onChange={onPeriodChange}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        }}
       >
-        {periods.map((period) => {
-          return <option key={period}>{period}</option>;
-        })}
-      </select>
+        <div className="input-field col s12">
+          <select
+            className="browser-default"
+            value={currentPeriod}
+            onChange={onPeriodChange}
+            style={{ width: '100px' }}
+          >
+            {periods.map((period) => {
+              return <option key={period}>{period}</option>;
+            })}
+          </select>
+        </div>
 
-      <input
-        type="text"
-        placeholder="Filtro..."
-        value={filteredText}
-        onChange={onFilterChange}
-        style={{ marginTop: '20px', marginBottom: '20px' }}
-      />
+        <input
+          type="text"
+          placeholder="Filtro..."
+          value={filteredText}
+          onChange={onFilterChange}
+          style={{
+            marginLeft: '10px',
+            marginTop: '20px',
+            marginBottom: '20px',
+          }}
+        />
+      </div>
 
       <div style={{ marginTop: '20px', marginBottom: '20px' }}>
         <button
