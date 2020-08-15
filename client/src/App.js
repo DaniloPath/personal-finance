@@ -59,7 +59,6 @@ export default function App() {
   React.useEffect(() => {
     const fetchTransactions = async () => {
       const { data } = await api.get(`/transaction?period=${currentPeriod}`);
-      console.log(data);
 
       setTransactions(data.transactions);
     };
@@ -109,8 +108,6 @@ export default function App() {
       return item._id === id;
     });
 
-    console.log(newSelectedTransaction);
-
     setSelectedTransaction(newSelectedTransaction);
   };
 
@@ -135,7 +132,7 @@ export default function App() {
           onPeriodChange={handlePeriodChange}
         />
       ) : (
-        <MaintenanceScreen />
+        <MaintenanceScreen transaction={selectedTransaction} />
       )}
     </div>
   );
