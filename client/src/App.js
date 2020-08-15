@@ -6,6 +6,17 @@ import MaintenanceScreen from './components/MaintenanceScreen';
 const api = axios.create({ baseURL: 'api' });
 const root = '/transaction';
 
+//Data atual, tipo ano-mes
+function today() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+  const today = `${year}-${month}`;
+
+  return today;
+}
+
 const PERIODS = [
   '2019-01',
   '2019-02',
@@ -51,10 +62,11 @@ const MAINTENANCE_SCREEN = 1;
 export default function App() {
   const [transactions, setTransactions] = React.useState([]);
   const [filteredTransactions, setFilteredTransactions] = React.useState([]);
-  const [currentPeriod, setCurrentPeriod] = React.useState(PERIODS[0]);
+  const [currentPeriod, setCurrentPeriod] = React.useState(today());
   const [currentScreen, setCurrentScreen] = React.useState(0);
   const [filteredText, setFilteredText] = React.useState('');
   const [selectedTransaction, setSelectedTransaction] = React.useState(null);
+  const [newTransaction, setNewTransaction] = React.useState(false);
 
   React.useEffect(() => {
     const fetchTransactions = async () => {
@@ -80,10 +92,12 @@ export default function App() {
 
   React.useEffect(() => {
     const newScreen =
-      selectedTransaction !== null ? MAINTENANCE_SCREEN : LIST_SCREEN;
+      selectedTransaction !== null || newTransaction
+        ? MAINTENANCE_SCREEN
+        : LIST_SCREEN;
 
     setCurrentScreen(newScreen);
-  }, [selectedTransaction]);
+  }, [selectedTransaction, newTransaction]);
 
   const handlePeriodChange = (event) => {
     const newPeriod = event.target.value;
@@ -117,26 +131,57 @@ export default function App() {
   };
 
   const handleCancel = () => {
+    setNewTransaction(false);
     setSelectedTransaction(null);
   };
 
-  const handleSave = (newTransaction) => {
-    console.log(newTransaction);
-    const { id } = newTransaction;
+  const handleSave = async (newTransaction) => {
+    const { _id } = newTransaction;
 
-    const completeTransaction = {
-      ...newTransaction,
-      year: Number(newTransaction.yearMonthDay.substring(0, 4)),
-      month: Number(newTransaction.yearMonthDay.substring(5, 7)),
-      day: Number(newTransaction.yearMonthDay.substring(8, 10)),
-    };
+    if (!_id) {
+      const insertingTrasanction = {
+        ...newTransaction,
+        year: Number(newTransaction.yearMonthDay.substring(0, 4)),
+        month: Number(newTransaction.yearMonthDay.substring(5, 7)),
+        day: Number(newTransaction.yearMonthDay.substring(8, 10)),
+      };
 
-    api.put(`${root}/${id}`, completeTransaction);
+      const { data } = await api.post(`${root}/`, insertingTrasanction);
+
+      const newTransactions = [...transactions, data.transaction];
+      newTransactions.sort((a, b) => {
+        return a.yearMonthDay.localeCompare(b.yearMonthDay);
+      });
+
+      setTransactions(newTransactions);
+      setNewTransaction(false);
+    } else {
+      const completeTransaction = {
+        ...newTransaction,
+        year: Number(newTransaction.yearMonthDay.substring(0, 4)),
+        month: Number(newTransaction.yearMonthDay.substring(5, 7)),
+        day: Number(newTransaction.yearMonthDay.substring(8, 10)),
+      };
+
+      await api.put(`${root}/${_id}`, completeTransaction);
+
+      const newTransactions = [...transactions];
+      const index = newTransactions.findIndex((transaction) => {
+        return transaction._id === completeTransaction._id;
+      });
+      newTransactions[index] = completeTransaction;
+      setTransactions(newTransactions);
+      setSelectedTransaction(null);
+    }
+  };
+
+  const handleNewTransaction = async () => {
+    setNewTransaction(true);
   };
 
   return (
     <div className="container">
-      <h1 className="center">Desafio Final do Bootcamp Full Stack</h1>
+      <h1 className="center">Finanças Pessoais</h1>
 
       {currentScreen === LIST_SCREEN ? (
         <ListScreen
@@ -148,6 +193,7 @@ export default function App() {
           onEditTransaction={handleEditTransaction}
           onFilterChange={handleFilterChange}
           onPeriodChange={handlePeriodChange}
+          onNewTransaction={handleNewTransaction}
         />
       ) : (
         <MaintenanceScreen

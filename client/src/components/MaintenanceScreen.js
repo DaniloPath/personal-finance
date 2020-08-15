@@ -1,11 +1,27 @@
 import React from 'react';
 
+const inserting = 0;
+const editing = 1;
+
+//Data atual
+function today() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+
+  const today = `${year}-${month}-${day}`;
+
+  return today;
+}
+
 export default function MaintenanceScreen({ transaction, onCancel, onSave }) {
-  const [description, setDescription] = React.useState('');
+  const [description, setDescription] = React.useState('Novo Lançamento');
   const [value, setValue] = React.useState(0);
-  const [category, setCategory] = React.useState('');
-  const [date, setDate] = React.useState('');
+  const [category, setCategory] = React.useState('Nova Categoria');
+  const [date, setDate] = React.useState(today());
   const [type, setType] = React.useState('-');
+  const [mode, setMode] = React.useState(inserting);
 
   React.useEffect(() => {
     if (!transaction) {
@@ -19,6 +35,7 @@ export default function MaintenanceScreen({ transaction, onCancel, onSave }) {
     setDate(yearMonthDay);
     setCategory(category);
     setType(type);
+    setMode(editing);
   }, [transaction]);
 
   const handleDescription = (event) => {
@@ -52,7 +69,7 @@ export default function MaintenanceScreen({ transaction, onCancel, onSave }) {
 
   const handleClickSave = () => {
     const newTransaction = {
-      id: transaction._id,
+      _id: !!transaction ? transaction._id : null,
       description,
       value,
       type,
@@ -120,7 +137,7 @@ export default function MaintenanceScreen({ transaction, onCancel, onSave }) {
             id="inputCategory"
           />
           <label htmlFor="inputCategory" className="active">
-            Descrição:
+            Categoria:
           </label>
         </div>
 

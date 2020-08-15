@@ -10,6 +10,7 @@ export default function ListScreen({
   onFilterChange,
   onDeleteTransaction,
   onPeriodChange,
+  onNewTransaction,
   currentPeriod,
   onEditTransaction,
 }) {
@@ -31,7 +32,17 @@ export default function ListScreen({
         placeholder="Filtro..."
         value={filteredText}
         onChange={onFilterChange}
+        style={{ marginTop: '20px', marginBottom: '20px' }}
       />
+
+      <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+        <button
+          className="waves-effect waves-light btn"
+          onClick={onNewTransaction}
+        >
+          Novo Registro...
+        </button>
+      </div>
 
       {transactions.map((transaction) => {
         const currentColor =
